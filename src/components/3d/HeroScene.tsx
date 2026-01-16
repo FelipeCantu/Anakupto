@@ -38,7 +38,8 @@ const SCENE_STATES: SceneState[] = [
         rotation: [0, -Math.PI / 4, 0],
         scale: 1.3,
         color: "#ff8c42",
-        knot: { p: 10, q: 3, radius: 0.8, tube: 0.35 }
+        // Reduced p from 10 to 6 for a cleaner morph
+        knot: { p: 6, q: 3, radius: 0.8, tube: 0.35 }
     },
     // 2: Flow - Smooth & Interwoven (Emerald/Neon)
     {
@@ -119,6 +120,9 @@ function Model() {
 
     const currentColor = useMemo(() => new THREE.Color(), []);
 
+    // Smoothing reference
+    const progressRef = useRef(0);
+
     useFrame((state, delta) => {
         try {
             const mesh = meshRef.current;
@@ -135,7 +139,16 @@ function Model() {
 
             const numStates = states.length;
             const totalStates = numStates - 1;
-            const rawProgress = progress * totalStates;
+
+            // Calculate target progress (0 to totalStates)
+            const targetRaw = progress * totalStates;
+
+            // Smooth damping: interpolation factor based on delta time
+            // Adjust '4' to change the "weight" (higher = faster, lower = heavier)
+            const smoothFactor = 1 - Math.exp(-4 * delta);
+            progressRef.current = THREE.MathUtils.lerp(progressRef.current, targetRaw, smoothFactor);
+
+            const rawProgress = progressRef.current;
 
             const influencesLen = influences.length;
             for (let i = 0; i < numStates; i++) {
@@ -164,24 +177,29 @@ function Model() {
 
             const s = THREE.MathUtils.lerp(current.scale, next.scale, percent);
 
+            // Add a subtle velocity-based tilt for extra polish
+            const velocity = (targetRaw - rawProgress);
+
             mesh.position.set(pX, pY, pZ);
             mesh.rotation.set(
-                rX + (state.clock?.elapsedTime ?? 0) * 0.2,
-                rY + (state.clock?.elapsedTime ?? 0) * 0.25,
+                rX + (state.clock?.elapsedTime ?? 0) * 0.2 + velocity * 0.2,
+                rY + (state.clock?.elapsedTime ?? 0) * 0.25 + velocity * 0.2,
                 rZ
             );
             mesh.scale.setScalar(s);
 
             if (material.color) {
-                currentColor.set(current.color).lerp(new THREE.Color(next.color), percent);
+                // Use HSL interpolation for vibrant color transitions
+                currentColor.set(current.color).lerpHSL(new THREE.Color(next.color), percent);
                 material.color.copy(currentColor);
             }
 
+            // Reduced peak distortion to keep shape legible
             const intensity = Math.sin(percent * Math.PI);
-            material.distortion = 0.1 + intensity * 2.5;
-            material.distortionScale = 0.5 + intensity * 1.5;
+            material.distortion = 0.1 + intensity * 1.5;
+            material.distortionScale = 0.5 + intensity * 1.0;
             material.ior = 1.2 + intensity * 0.6;
-            material.chromaticAberration = 0.3 + intensity * 1.2;
+            material.chromaticAberration = 0.3 + intensity * 0.5;
         } catch (e) {
             // Logs once per error type to avoid spamming
             if (state.clock.elapsedTime < 2) {
@@ -209,54 +227,70 @@ function Model() {
     );
 }
 
-function AbstractLines() {
-    // Generate random curves
-    const count = 15;
-    const lines = useMemo(() => {
-        return new Array(count).fill(0).map((_, i) => {
-            const points = [];
-            const yOffset = (i - count / 2) * 2;
-            for (let x = -15; x <= 15; x++) {
-                points.push(
-                    new THREE.Vector3(
-                        x,
-                        yOffset + Math.sin(x * 0.5 + i) * 2,
-                        -5 + Math.cos(x * 0.3) * 2 // depth variation
-                    )
-                );
-            }
-            return new THREE.CatmullRomCurve3(points);
-        });
+// A mesh that spans width and looks like a triangulated network
+function GeometricField() {
+    const groupRef = useRef<THREE.Group>(null);
+    const { scrollYProgress } = useScroll();
+
+    // Create a grid of points
+    const geometry = useMemo(() => {
+        // Wide plane to cover full screen: width, height, widthSegments, heightSegments
+        // 60 width is plenty for desktop
+        const geo = new THREE.PlaneGeometry(60, 40, 40, 25);
+
+        // Randomize vertices slightly to get that "organic" triangulation look
+        const pos = geo.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+            // x, y, z processing
+            // We keep z flat-ish but noisy
+            pos.setZ(i, (Math.random() - 0.5) * 2);
+
+            // Slight x/y jitter to break the perfect grid
+            pos.setX(i, pos.getX(i) + (Math.random() - 0.5) * 0.5);
+            pos.setY(i, pos.getY(i) + (Math.random() - 0.5) * 0.5);
+        }
+        geo.computeVertexNormals();
+        return geo;
     }, []);
 
-    const { scrollYProgress } = useScroll();
-    const groupRef = useRef<THREE.Group>(null);
+    // Smoothing for parallax
+    const scrollRef = useRef(0);
 
-    useFrame(() => {
+    useFrame((state, delta) => {
         if (groupRef.current) {
-            // Parallax effect on the whole group
-            const p = scrollYProgress?.get() ?? 0;
-            groupRef.current.position.y = p * 5; // Move up as we scroll down (inverse parallax)
-            groupRef.current.rotation.z = p * 0.2;
+            const target = scrollYProgress?.get() ?? 0;
+            // Smooth damping
+            scrollRef.current = THREE.MathUtils.lerp(scrollRef.current, target, 1 - Math.exp(-3 * delta));
+            const p = scrollRef.current;
+
+            // Parallax movement - moves up/farther
+            groupRef.current.position.y = p * 8 - 5;
+            groupRef.current.position.z = -15 + p * 2;
+            groupRef.current.rotation.x = -Math.PI / 4 + p * 0.1;
+
+            // Subtle constant wave motion
+            groupRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.1) * 0.05;
         }
     });
 
     return (
-        <group ref={groupRef} position={[0, -5, -10]}>
-            {lines && lines.map((curve, i) => {
-                if (!curve) return null;
-                const points = typeof curve.getPoints === 'function' ? curve.getPoints(50) : [];
-                return (
-                    <Line
-                        key={i}
-                        points={points}
-                        color={i % 2 === 0 ? "#4a90e2" : "#9013fe"}
-                        opacity={0.3}
-                        transparent
-                        lineWidth={1}
-                    />
-                );
-            })}
+        <group ref={groupRef} position={[0, -10, -15]} rotation={[-Math.PI / 4, 0, 0]}>
+            {/* The "Triangle Lines" - Wireframe */}
+            <lineSegments>
+                <wireframeGeometry args={[geometry]} />
+                <lineBasicMaterial color="#4a90e2" opacity={0.35} transparent />
+            </lineSegments>
+
+            {/* The "Dots" - Vertices */}
+            <points geometry={geometry}>
+                <pointsMaterial
+                    size={0.15}
+                    color="#9013fe"
+                    opacity={0.8}
+                    transparent
+                    sizeAttenuation
+                />
+            </points>
         </group>
     );
 }
@@ -266,9 +300,15 @@ function BackgroundParallax() {
     const starsRef = useRef<any>(null);
     const { scrollYProgress } = useScroll();
 
-    useFrame(() => {
+    const starScrollRef = useRef(0);
+
+    useFrame((state, delta) => {
         if (starsRef.current) {
-            starsRef.current.rotation.y = (scrollYProgress?.get() ?? 0) * 0.5;
+            const target = scrollYProgress?.get() ?? 0;
+            // Damping for stars (very smooth/heavy)
+            starScrollRef.current = THREE.MathUtils.lerp(starScrollRef.current, target, 1 - Math.exp(-2 * delta));
+
+            starsRef.current.rotation.y = starScrollRef.current * 0.5;
         }
     })
 
@@ -288,7 +328,9 @@ export default function HeroScene() {
                 <Environment preset="city" />
 
                 <Model />
-                <AbstractLines />
+                <Model />
+                <GeometricField />
+                <BackgroundParallax />
                 <BackgroundParallax />
 
                 {/* Fog for depth */}
