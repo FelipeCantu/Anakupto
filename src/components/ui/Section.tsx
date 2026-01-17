@@ -22,16 +22,16 @@ export function HeroContent() {
     const containerRef = useRef<HTMLDivElement>(null);
 
     return (
-        <div ref={containerRef} className="z-10 text-center max-w-4xl mx-auto space-y-8 mix-blend-difference">
+        <div ref={containerRef} className="z-20 text-center max-w-4xl mx-auto space-y-8 mix-blend-difference">
             <motion.h1
                 initial={{ opacity: 0, y: 100 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, ease: "easeOut" }}
                 className="text-6xl md:text-8xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50"
             >
-                NEXT GEN
+                ANAKUPTO
                 <br />
-                <span className="text-white">DIMENSIONS</span>
+                <span className="text-white">3D WEB</span>
             </motion.h1>
 
             <motion.p

@@ -5,6 +5,8 @@ import { Environment, MeshTransmissionMaterial, Float, Stars, Trail, Line } from
 import { useRef, useMemo, useState, useEffect } from "react";
 import * as THREE from "three";
 import { useScroll } from "framer-motion";
+import { Preloader } from "@/components/ui/Preloader";
+import { InteractiveStars } from "@/components/3d/InteractiveStars";
 
 // Define the parameters for our morphable TorusKnot
 type KnotParams = {
@@ -34,7 +36,7 @@ const SCENE_STATES: SceneState[] = [
     },
     // 1: Technical - Sharp & Crystalline (Amber/Solar)
     {
-        position: [2.5, 0, 0],
+        position: [3.5, 0, 0],
         rotation: [0, -Math.PI / 4, 0],
         scale: 1.3,
         color: "#ff8c42",
@@ -43,7 +45,7 @@ const SCENE_STATES: SceneState[] = [
     },
     // 2: Flow - Smooth & Interwoven (Emerald/Neon)
     {
-        position: [-2.5, 0, 0],
+        position: [-3.5, 0, 0],
         rotation: [Math.PI / 8, Math.PI / 4, 0],
         scale: 1.4,
         color: "#00ff88",
@@ -53,7 +55,7 @@ const SCENE_STATES: SceneState[] = [
     {
         position: [0, -0.5, 0],
         rotation: [Math.PI / 2, 0, Math.PI],
-        scale: 1.1,
+        scale: 1.3,
         color: "#bf94ff",
         knot: { p: 1, q: 2, radius: 1.1, tube: 0.12 }
     },
@@ -120,8 +122,10 @@ function Model() {
 
     const currentColor = useMemo(() => new THREE.Color(), []);
 
-    // Smoothing reference
+    // Smoothing reference for scroll
     const progressRef = useRef(0);
+    // Smoothing reference for mouse
+    const mouseRef = useRef({ x: 0, y: 0 });
 
     useFrame((state, delta) => {
         try {
@@ -134,6 +138,20 @@ function Model() {
             if (!influences || !Array.isArray(influences)) return;
 
             const progress = scrollYProgress?.get() ?? 0;
+
+            // Mouse smoothing
+            // We want the model to look at the mouse. 
+            // state.pointer.x is -1 to 1.
+            const targetMouseX = state.pointer.x * 0.5; // Scale factor for rotation intensity
+            const targetMouseY = state.pointer.y * 0.5;
+
+            // Smooth the mouse values
+            mouseRef.current.x = THREE.MathUtils.lerp(mouseRef.current.x, targetMouseX, 0.05); // 0.05 is the damping factor
+            mouseRef.current.y = THREE.MathUtils.lerp(mouseRef.current.y, targetMouseY, 0.05);
+
+            const mouseX = mouseRef.current.x;
+            const mouseY = mouseRef.current.y;
+
             const states = SCENE_STATES;
             if (!Array.isArray(states) || states.length === 0) return;
 
@@ -181,11 +199,16 @@ function Model() {
             const velocity = (targetRaw - rawProgress);
 
             mesh.position.set(pX, pY, pZ);
+
+            // ROTATION WITH MOUSE INTERACTION
+            // We adding mouseX to Y rotation (turning left/right)
+            // and mouseY to X rotation (looking up/down)
             mesh.rotation.set(
-                rX + (state.clock?.elapsedTime ?? 0) * 0.2 + velocity * 0.2,
-                rY + (state.clock?.elapsedTime ?? 0) * 0.25 + velocity * 0.2,
+                rX + (state.clock?.elapsedTime ?? 0) * 0.2 + velocity * 0.2 - mouseY,
+                rY + (state.clock?.elapsedTime ?? 0) * 0.25 + velocity * 0.2 + mouseX,
                 rZ
             );
+
             mesh.scale.setScalar(s);
 
             if (material.color) {
@@ -295,47 +318,36 @@ function GeometricField() {
     );
 }
 
-// Background that moves with camera slightly for depth
-function BackgroundParallax() {
-    const starsRef = useRef<any>(null);
-    const { scrollYProgress } = useScroll();
+// BackgroundParallax removed in favor of InteractiveStars
 
-    const starScrollRef = useRef(0);
-
-    useFrame((state, delta) => {
-        if (starsRef.current) {
-            const target = scrollYProgress?.get() ?? 0;
-            // Damping for stars (very smooth/heavy)
-            starScrollRef.current = THREE.MathUtils.lerp(starScrollRef.current, target, 1 - Math.exp(-2 * delta));
-
-            starsRef.current.rotation.y = starScrollRef.current * 0.5;
-        }
-    })
-
-    return (
-        <group ref={starsRef}>
-            <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
-        </group>
-    )
-}
 
 export default function HeroScene() {
     return (
-        <div className="fixed top-0 left-0 w-full h-screen -z-10 bg-black">
-            <Canvas camera={{ position: [0, 0, 8], fov: 45 }} gl={{ antialias: true, alpha: false }}>
-                <directionalLight position={[10, 10, 5]} intensity={2} />
-                <ambientLight intensity={0.5} />
-                <Environment preset="city" />
+        <>
+            <Preloader />
+            {/* Global Background - Deepest Layer */}
+            <div className="fixed top-0 left-0 w-full h-screen -z-50 bg-black" />
 
-                <Model />
-                <Model />
-                <GeometricField />
-                <BackgroundParallax />
-                <BackgroundParallax />
+            {/* 3D Scene - Mid-Foreground (On top of background elements, behind text) */}
+            <div className="fixed top-0 left-0 w-full h-screen z-10 pointer-events-none">
+                <Canvas
+                    camera={{ position: [0, 0, 8], fov: 45 }}
+                    gl={{ antialias: true, alpha: true }}
+                    eventSource={typeof window !== "undefined" ? document.body : undefined}
+                    eventPrefix="client"
+                >
+                    <directionalLight position={[10, 10, 5]} intensity={2} />
+                    <ambientLight intensity={0.5} />
+                    <Environment preset="city" />
 
-                {/* Fog for depth */}
-                <fog attach="fog" args={['#000', 5, 25]} />
-            </Canvas>
-        </div>
+                    <Model />
+                    <GeometricField />
+                    <InteractiveStars />
+
+                    {/* Fog for depth */}
+                    <fog attach="fog" args={['#000', 5, 25]} />
+                </Canvas>
+            </div>
+        </>
     );
 }
