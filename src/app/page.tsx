@@ -3,6 +3,8 @@
 import HeroScene from "@/components/3d/HeroScene";
 import { HeroContent, Section } from "@/components/ui/Section";
 import { DynamicContainer } from "@/components/ui/DynamicContainer";
+import { ServicesGrid } from "@/components/ui/ServicesGrid";
+import { PortfolioCarousel } from "@/components/ui/PortfolioCarousel";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 
@@ -25,11 +27,11 @@ export default function Home() {
       <Section className="relative overflow-hidden">
         {/* Glass Triangle Background */}
         <motion.div
-          initial={{ x: "-100%" }}
-          whileInView={{ x: 0 }}
+          initial={{ opacity: 0, x: -50 }}
+          whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 1, ease: "circOut" }}
-          className="absolute top-0 left-0 w-full h-full bg-gray-500 z-0 opacity-50"
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="absolute top-0 left-0 w-full h-full bg-zinc-800/80 z-0 backdrop-blur-sm border-r border-white/10"
           style={{
             clipPath: "polygon(0 0, 100% 0, 0 100%)"
           }}
@@ -62,11 +64,11 @@ export default function Home() {
       <Section className="relative overflow-hidden">
         {/* Glass Triangle Background */}
         <motion.div
-          initial={{ x: "100%" }}
-          whileInView={{ x: 0 }}
+          initial={{ opacity: 0, x: 50 }}
+          whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 1, ease: "circOut" }}
-          className="absolute top-0 left-0 w-full h-full bg-gray-500 z-0 opacity-50"
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="absolute top-0 left-0 w-full h-full bg-zinc-800/80 z-0 backdrop-blur-sm border-r border-white/10"
           style={{
             clipPath: "polygon(0 100%, 100% 0, 100% 100%)"
           }}
@@ -93,6 +95,12 @@ export default function Home() {
           </div>
         </div>
       </Section>
+
+      <Section className="relative z-20">
+        <ServicesGrid />
+      </Section>
+
+      <PortfolioCarousel />
 
       {/* State 3: Model Center */}
       <Section className="">

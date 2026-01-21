@@ -66,7 +66,7 @@ export function DynamicContainer({
                 rotateX,
                 rotateY,
             }}
-            className={`relative group rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md p-8 shadow-2xl overflow-hidden ${className}`}
+            className={`relative group rounded-2xl border border-white/20 bg-zinc-900/80 backdrop-blur-md p-8 shadow-2xl overflow-hidden ${className}`}
         >
             {/* Moving Glow Gradient */}
             <motion.div

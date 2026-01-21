@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Menu } from "lucide-react";
 
 export function Header() {
     return (
@@ -27,6 +28,25 @@ export function Header() {
                     </span>
                 </Link>
             </div>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-8 pointer-events-auto">
+                {['Work', 'Services', 'About', 'Contact'].map((item) => (
+                    <Link
+                        key={item}
+                        href={`/${item.toLowerCase()}`}
+                        className="text-sm font-medium text-zinc-400 hover:text-white transition-colors relative group"
+                    >
+                        {item}
+                        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full" />
+                    </Link>
+                ))}
+            </nav>
+
+            {/* Mobile Menu Button */}
+            <button className="md:hidden text-white pointer-events-auto hover:text-blue-400 transition-colors">
+                <Menu size={24} />
+            </button>
         </motion.header>
     );
 }

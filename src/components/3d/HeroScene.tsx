@@ -107,6 +107,7 @@ function Model() {
     }, []);
 
     // CRITICAL: Force morph target initialization before the first render
+    // CRITICAL: Force morph target initialization before the first render
     useEffect(() => {
         if (meshRef.current) {
             // Force three.js to recognize morph targets
@@ -117,8 +118,11 @@ function Model() {
             if (!meshRef.current.morphTargetInfluences || meshRef.current.morphTargetInfluences.length === 0) {
                 meshRef.current.morphTargetInfluences = new Array(SCENE_STATES.length).fill(0);
             }
+            setReady(true);
         }
     }, [baseGeometry]);
+
+    const [ready, setReady] = useState(false);
 
     const currentColor = useMemo(() => new THREE.Color(), []);
 
@@ -130,15 +134,17 @@ function Model() {
     useFrame((state, delta) => {
         try {
             const mesh = meshRef.current;
+            // Only update if ready and material exists
+            if (!ready || !mesh || !meshRef.current.morphTargetInfluences) return;
             const material = materialRef.current;
-            if (!mesh || !material) return;
+            if (!material) return;
 
             // EXTREMELY DEFENSIVE: Check morphTargetInfluences
             const influences = mesh.morphTargetInfluences;
             if (!influences || !Array.isArray(influences)) return;
 
             const progress = scrollYProgress?.get() ?? 0;
-
+            // ... strict mode ...
             // Mouse smoothing
             // We want the model to look at the mouse. 
             // state.pointer.x is -1 to 1.
@@ -234,17 +240,19 @@ function Model() {
     return (
         <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
             <mesh ref={meshRef} geometry={baseGeometry}>
-                <MeshTransmissionMaterial
-                    ref={materialRef}
-                    backside
-                    backsideThickness={5}
-                    thickness={1.5}
-                    roughness={0.02}
-                    anisotropy={0.5}
-                    transmission={1}
-                    temporalDistortion={0.1}
-                    background={new THREE.Color('#050505')}
-                />
+                {ready && (
+                    <MeshTransmissionMaterial
+                        ref={materialRef}
+                        backside
+                        backsideThickness={5}
+                        thickness={1.5}
+                        roughness={0.02}
+                        anisotropy={0.5}
+                        transmission={1}
+                        temporalDistortion={0.1}
+                        background={new THREE.Color('#050505')}
+                    />
+                )}
             </mesh>
         </Float>
     );
@@ -335,6 +343,13 @@ export default function HeroScene() {
                     gl={{ antialias: true, alpha: true }}
                     eventSource={typeof window !== "undefined" ? document.body : undefined}
                     eventPrefix="client"
+                    style={{
+                        position: "relative",
+                        width: "100%",
+                        height: "100%",
+                        overflow: "hidden",
+                        pointerEvents: "none",
+                    }}
                 >
                     <directionalLight position={[10, 10, 5]} intensity={2} />
                     <ambientLight intensity={0.5} />
