@@ -135,7 +135,7 @@ function Model() {
         try {
             const mesh = meshRef.current;
             // Only update if ready and material exists
-            if (!ready || !mesh || !meshRef.current.morphTargetInfluences) return;
+            if (!ready || !mesh || !mesh.morphTargetInfluences) return;
             const material = materialRef.current;
             if (!material) return;
 
