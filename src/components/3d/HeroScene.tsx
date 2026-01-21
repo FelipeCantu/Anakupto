@@ -2,7 +2,7 @@
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, MeshTransmissionMaterial, Float, Stars, Trail, Line } from "@react-three/drei";
-import { useRef, useMemo, useState, useEffect } from "react";
+import { useRef, useMemo, useState, useEffect, useLayoutEffect } from "react";
 import * as THREE from "three";
 import { useScroll } from "framer-motion";
 import { Preloader } from "@/components/ui/Preloader";
@@ -107,8 +107,8 @@ function Model() {
     }, []);
 
     // CRITICAL: Force morph target initialization before the first render
-    // CRITICAL: Force morph target initialization before the first render
-    useEffect(() => {
+    // Use useLayoutEffect to ensure this runs synchronously before paint
+    useLayoutEffect(() => {
         if (meshRef.current) {
             // Force three.js to recognize morph targets
             meshRef.current.updateMorphTargets();
