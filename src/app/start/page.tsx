@@ -174,7 +174,16 @@ function StepWrapper({ children }: { children: React.ReactNode }) {
     );
 }
 
-function InputGroup({ label, type = "text", value, onChange, placeholder, autoFocus }: any) {
+interface InputGroupProps {
+    label: string;
+    type?: string;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    placeholder?: string;
+    autoFocus?: boolean;
+}
+
+function InputGroup({ label, type = "text", value, onChange, placeholder, autoFocus }: InputGroupProps) {
     return (
         <div className="space-y-2">
             <label className="text-sm font-medium text-zinc-400 ml-1">{label}</label>
@@ -190,13 +199,20 @@ function InputGroup({ label, type = "text", value, onChange, placeholder, autoFo
     );
 }
 
-function SelectableCard({ label, selected, onClick, compact }: any) {
+interface SelectableCardProps {
+    label: string;
+    selected: boolean;
+    onClick: () => void;
+    compact?: boolean;
+}
+
+function SelectableCard({ label, selected, onClick, compact }: SelectableCardProps) {
     return (
         <div
             onClick={onClick}
             className={`cursor-pointer border rounded-xl flex items-center transition-all duration-300 ${selected
-                    ? "bg-white text-black border-white"
-                    : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:bg-zinc-900/50"
+                ? "bg-white text-black border-white"
+                : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-600 hover:bg-zinc-900/50"
                 } ${compact ? 'p-4 justify-center text-center text-sm font-medium' : 'p-6 justify-between'}`}
         >
             <span className={compact ? "" : "text-lg font-medium"}>{label}</span>
@@ -205,14 +221,19 @@ function SelectableCard({ label, selected, onClick, compact }: any) {
     );
 }
 
-function NextButton({ onClick, disabled }: any) {
+interface ButtonProps {
+    onClick: () => void;
+    disabled?: boolean;
+}
+
+function NextButton({ onClick, disabled }: ButtonProps) {
     return (
         <button
             onClick={onClick}
             disabled={disabled}
             className={`flex items-center gap-2 px-8 py-3 rounded-full font-medium transition-all ${disabled
-                    ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-500 hover:pr-10"
+                ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-blue-500 hover:pr-10"
                 }`}
         >
             Next <ArrowRight size={18} />
@@ -220,7 +241,7 @@ function NextButton({ onClick, disabled }: any) {
     );
 }
 
-function BackButton({ onClick }: any) {
+function BackButton({ onClick }: { onClick: () => void }) {
     return (
         <button
             onClick={onClick}

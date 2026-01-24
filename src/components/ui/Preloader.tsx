@@ -10,10 +10,23 @@ export function Preloader() {
     const [hasLoaded, setHasLoaded] = useState(false);
 
     useEffect(() => {
-        if (progress === 100) {
+        let timer: NodeJS.Timeout;
+
+        // Condition 1: Normal completion
+        if (progress === 100 && !active) {
             setHasLoaded(true);
         }
-    }, [progress]);
+
+        // Condition 2: Failsafe - if it takes too long, just load it
+        // This prevents the "stuck" loading screen if an asset fails to report
+        if (progress > 0) {
+            timer = setTimeout(() => {
+                setHasLoaded(true);
+            }, 3000); // 3 second max wait
+        }
+
+        return () => clearTimeout(timer);
+    }, [progress, active]);
 
     return (
         <AnimatePresence>
