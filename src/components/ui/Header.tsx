@@ -60,7 +60,7 @@ export function Header() {
                                     className="text-sm font-medium text-zinc-400 hover:text-white transition-colors relative group cursor-pointer"
                                 >
                                     {item}
-                                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full" />
+                                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#e59500] transition-all duration-300 group-hover:w-full" />
                                 </button>
                             ) : (
                                 <Link
@@ -68,7 +68,7 @@ export function Header() {
                                     className="text-sm font-medium text-zinc-400 hover:text-white transition-colors relative group"
                                 >
                                     {item}
-                                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full" />
+                                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#e59500] transition-all duration-300 group-hover:w-full" />
                                 </Link>
                             )}
                         </div>
@@ -78,7 +78,7 @@ export function Header() {
                 {/* Mobile Menu Button */}
                 <button
                     onClick={() => setIsOpen(true)}
-                    className={`md:hidden text-white pointer-events-auto hover:text-blue-400 transition-colors z-50 ${isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                    className={`md:hidden text-white pointer-events-auto hover:text-[#e59500] transition-colors z-50 ${isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
                 >
                     <Menu size={24} />
                 </button>

@@ -24,7 +24,7 @@ export function Footer() {
                                 className="object-contain"
                             />
                         </div>
-                        <span className="text-2xl font-bold tracking-tight text-white group-hover:text-blue-400 transition-colors">
+                        <span className="text-2xl font-bold tracking-tight text-white group-hover:text-[#e59500] transition-colors">
                             Anakupto
                         </span>
                     </Link>

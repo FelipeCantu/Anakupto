@@ -23,44 +23,13 @@ export function HeroContent() {
     const containerRef = useRef<HTMLDivElement>(null);
 
     return (
-        <div ref={containerRef} className="z-20 w-full h-full flex flex-col justify-center items-center relative pb-32 md:pb-0 p-8">
+        <div ref={containerRef} className="z-20 w-full h-full absolute inset-0 flex flex-col justify-center items-center pb-32 md:pb-0 p-8">
 
             {/* HUD / Tech Elements (Absolute to Section) */}
             <div className="absolute inset-0 pointer-events-none select-none hidden md:block">
-                {/* Top Left */}
-                <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1.5, duration: 1 }}
-                    className="absolute top-0 left-0 flex flex-col gap-2"
-                >
-                    <div className="flex items-center gap-2 text-xs font-mono text-zinc-500">
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                        <span>SYSTEM.ONLINE</span>
-                    </div>
-                    <div className="w-24 h-[1px] bg-gradient-to-r from-zinc-500/50 to-transparent" />
-                </motion.div>
-
-                {/* Top Right */}
-                <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1.7, duration: 1 }}
-                    className="absolute top-0 right-0 text-right"
-                >
-                    <span className="text-xs font-mono text-zinc-600">V.2.0.24</span>
-                    <div className="w-24 h-[1px] bg-gradient-to-l from-zinc-500/50 to-transparent mt-2 ml-auto" />
-                </motion.div>
-
-                {/* Bottom Left coordinate */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1.9, duration: 1 }}
-                    className="absolute bottom-10 left-0 font-mono text-xs text-zinc-600"
-                >
-                    34°03'00"N 118°15'00"W
-                </motion.div>
+                {/* Top Left - Removed */}
+                {/* Top Right - Removed */}
+                {/* Bottom Left - Removed */}
 
                 {/* Bottom Right Scroll Hint */}
                 <motion.div

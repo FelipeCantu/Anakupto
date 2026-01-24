@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, MeshTransmissionMaterial, Float, Stars, Trail, Line, Lightformer } from "@react-three/drei";
+import { Environment, MeshTransmissionMaterial, Float, Stars, Trail, Line } from "@react-three/drei";
 import { useRef, useMemo, useState, useEffect, useLayoutEffect } from "react";
 import * as THREE from "three";
 import { useScroll } from "framer-motion";
@@ -26,37 +26,37 @@ type SceneState = {
 
 // Morphable Shapes (Base is the first one)
 const SCENE_STATES: SceneState[] = [
-    // 0: Hero - Balanced & Airy (Sky Blue)
+    // 0: Hero - Balanced & Airy (Secondary: #002642)
     {
         position: [0, 0, 0],
         rotation: [0, 0, 0],
         scale: 1.6,
-        color: "#99d5ff",
+        color: "#002642",
         knot: { p: 2, q: 3, radius: 1, tube: 0.22 }
     },
-    // 1: Technical - Sharp & Crystalline (Amber/Solar)
+    // 1: Technical - Sharp & Crystalline (Accent: #e59500)
     {
         position: [3.5, 0, 0],
         rotation: [0, -Math.PI / 4, 0],
         scale: 1.3,
-        color: "#ff8c42",
+        color: "#e59500",
         // Reduced p from 10 to 6 for a cleaner morph
         knot: { p: 6, q: 3, radius: 0.8, tube: 0.35 }
     },
-    // 2: Flow - Smooth & Interwoven (Emerald/Neon)
+    // 2: Flow - Smooth & Interwoven (Primary: #840032)
     {
         position: [-3.5, 0, 0],
         rotation: [Math.PI / 8, Math.PI / 4, 0],
         scale: 1.4,
-        color: "#00ff88",
+        color: "#840032",
         knot: { p: 3, q: 2, radius: 0.9, tube: 0.25 }
     },
-    // 3: Future - Minimalist & Orbital (Deep Lavender)
+    // 3: Future - Minimalist & Orbital (Foreground: #e5dada)
     {
         position: [0, -0.5, 0],
         rotation: [Math.PI / 2, 0, Math.PI],
         scale: 1.3,
-        color: "#bf94ff",
+        color: "#e5dada",
         knot: { p: 1, q: 2, radius: 1.1, tube: 0.12 }
     },
 ];
@@ -250,7 +250,7 @@ function Model() {
                         anisotropy={0.5}
                         transmission={1}
                         temporalDistortion={0.1}
-                        background={new THREE.Color('#050505')}
+                        background={new THREE.Color('#02040f')}
                     />
                 )}
             </mesh>
@@ -309,14 +309,14 @@ function GeometricField() {
             {/* The "Triangle Lines" - Wireframe */}
             <lineSegments>
                 <wireframeGeometry args={[geometry]} />
-                <lineBasicMaterial color="#4a90e2" opacity={0.35} transparent />
+                <lineBasicMaterial color="#002642" opacity={0.35} transparent />
             </lineSegments>
 
             {/* The "Dots" - Vertices */}
             <points geometry={geometry}>
                 <pointsMaterial
                     size={0.15}
-                    color="#9013fe"
+                    color="#e5dada"
                     opacity={0.8}
                     transparent
                     sizeAttenuation
@@ -353,14 +353,7 @@ export default function HeroScene() {
                 >
                     <directionalLight position={[10, 10, 5]} intensity={2} />
                     <ambientLight intensity={0.5} />
-                    <Environment resolution={256}>
-                        <group rotation={[-Math.PI / 3, 0, 1]}>
-                            <Lightformer form="circle" intensity={4} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={2} />
-                            <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, 1, -1]} scale={2} />
-                            <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, -1, -1]} scale={2} />
-                            <Lightformer form="circle" intensity={2} rotation-y={-Math.PI / 2} position={[10, 1, 0]} scale={8} />
-                        </group>
-                    </Environment>
+                    <Environment preset="city" />
 
                     <Model />
                     <GeometricField />

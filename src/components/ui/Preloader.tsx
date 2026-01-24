@@ -10,23 +10,22 @@ export function Preloader() {
     const [hasLoaded, setHasLoaded] = useState(false);
 
     useEffect(() => {
-        let timer: NodeJS.Timeout;
-
         // Condition 1: Normal completion
         if (progress === 100 && !active) {
             setHasLoaded(true);
         }
+    }, [progress, active]);
 
-        // Condition 2: Failsafe - if it takes too long, just load it
-        // This prevents the "stuck" loading screen if an asset fails to report
-        if (progress > 0) {
-            timer = setTimeout(() => {
-                setHasLoaded(true);
-            }, 3000); // 3 second max wait
-        }
+    // Condition 2: Failsafe - Guaranteed max load time
+    // We start this on mount and never cancel it (unless unmounted)
+    // This fixed the bug where progress updates kept resetting the timer
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setHasLoaded(true);
+        }, 2000); // 2 second absolute max wait
 
         return () => clearTimeout(timer);
-    }, [progress, active]);
+    }, []);
 
     return (
         <AnimatePresence>
@@ -53,7 +52,7 @@ export function Preloader() {
                     </motion.div>
 
                     {/* Glitchy Text */}
-                    <div className="relative font-mono text-4xl font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">
+                    <div className="relative font-mono text-4xl font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-[#840032] to-[#e59500]">
                         <span className="relative inline-block glitch-text">
                             {progress.toFixed(0)}%
                         </span>
@@ -66,7 +65,7 @@ export function Preloader() {
                     {/* Progress Bar Line */}
                     <div className="absolute bottom-0 left-0 w-full h-1 bg-zinc-900">
                         <motion.div
-                            className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
+                            className="h-full bg-gradient-to-r from-[#840032] to-[#e59500]"
                             initial={{ width: "0%" }}
                             animate={{ width: `${progress}%` }}
                             transition={{ ease: "linear" }}
