@@ -11,11 +11,7 @@ export function Preloader() {
 
     useEffect(() => {
         if (progress === 100) {
-            // Add a small delay for dramatic effect
-            const timer = setTimeout(() => {
-                setHasLoaded(true);
-            }, 800);
-            return () => clearTimeout(timer);
+            setHasLoaded(true);
         }
     }, [progress]);
 

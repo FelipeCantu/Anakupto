@@ -4,6 +4,8 @@ import "./globals.css";
 import { SmoothScroll } from "@/components/ui/SmoothScroll";
 import { Header } from "@/components/ui/Header";
 import { Footer } from "@/components/ui/Footer";
+import { UIProvider } from "@/context/UIContext";
+import { ContactDrawer } from "@/components/ui/ContactDrawer";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -24,11 +26,14 @@ export default function RootLayout({
   return (
     <html lang="en" className="lenis">
       <body className={`${outfit.variable} antialiased bg-background text-foreground`}>
-        <Header />
-        <SmoothScroll>
-          {children}
-          <Footer />
-        </SmoothScroll>
+        <UIProvider>
+          <Header />
+          <ContactDrawer />
+          <SmoothScroll>
+            {children}
+            <Footer />
+          </SmoothScroll>
+        </UIProvider>
       </body>
     </html>
   );

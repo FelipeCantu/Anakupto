@@ -3,14 +3,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Github, Twitter, Linkedin, Mail } from "lucide-react";
+import { useUI } from "@/context/UIContext";
 
 export function Footer() {
     const currentYear = new Date().getFullYear();
+    const { openContact } = useUI();
 
     return (
-        <footer className="w-full bg-black text-white pt-20 pb-10 border-t border-white/10 relative overflow-hidden">
-            {/* Background decoration */}
-            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+        <footer className="w-full bg-black text-white pt-20 pb-10 relative overflow-hidden">
 
             <div className="max-w-7xl mx-auto px-8 grid md:grid-cols-4 gap-12 mb-20 relative z-10">
                 {/* Brand Column */}
@@ -40,9 +40,21 @@ export function Footer() {
                     <ul className="space-y-4">
                         {['Work', 'Services', 'About', 'Contact'].map((item) => (
                             <li key={item}>
-                                <Link href={`/${item.toLowerCase()}`} className="text-zinc-300 hover:text-white hover:translate-x-1 transition-all inline-block">
-                                    {item}
-                                </Link>
+                                {item === 'Contact' ? (
+                                    <button
+                                        onClick={openContact}
+                                        className="text-zinc-300 hover:text-white hover:translate-x-1 transition-all inline-block"
+                                    >
+                                        {item}
+                                    </button>
+                                ) : (
+                                    <Link
+                                        href={item === 'About' ? '/about' : `/#${item.toLowerCase()}`}
+                                        className="text-zinc-300 hover:text-white hover:translate-x-1 transition-all inline-block"
+                                    >
+                                        {item}
+                                    </Link>
+                                )}
                             </li>
                         ))}
                     </ul>

@@ -38,7 +38,7 @@ const services = [
 
 export function ServicesGrid() {
     return (
-        <div className="max-w-7xl mx-auto px-8 py-24 relative z-20">
+        <div id="services" className="max-w-7xl mx-auto px-4 md:px-8 py-24 relative z-20">
             <div className="text-center mb-16">
                 <motion.h2
                     initial={{ opacity: 0, y: 20 }}

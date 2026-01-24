@@ -67,7 +67,7 @@ export function PortfolioCarousel() {
     }, []);
 
     return (
-        <div className="w-full py-32 overflow-hidden relative z-20">
+        <div id="work" className="w-full py-32 overflow-hidden relative z-20">
             <div className="max-w-7xl mx-auto px-8 mb-16 flex justify-between items-end">
                 <div>
                     <h2 className="text-4xl md:text-6xl font-bold mb-4">Selected Work</h2>

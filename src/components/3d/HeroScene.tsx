@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, MeshTransmissionMaterial, Float, Stars, Trail, Line } from "@react-three/drei";
+import { Environment, MeshTransmissionMaterial, Float, Stars, Trail, Line, Lightformer } from "@react-three/drei";
 import { useRef, useMemo, useState, useEffect, useLayoutEffect } from "react";
 import * as THREE from "three";
 import { useScroll } from "framer-motion";
@@ -353,7 +353,14 @@ export default function HeroScene() {
                 >
                     <directionalLight position={[10, 10, 5]} intensity={2} />
                     <ambientLight intensity={0.5} />
-                    <Environment preset="city" />
+                    <Environment resolution={256}>
+                        <group rotation={[-Math.PI / 3, 0, 1]}>
+                            <Lightformer form="circle" intensity={4} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={2} />
+                            <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, 1, -1]} scale={2} />
+                            <Lightformer form="circle" intensity={2} rotation-y={Math.PI / 2} position={[-5, -1, -1]} scale={2} />
+                            <Lightformer form="circle" intensity={2} rotation-y={-Math.PI / 2} position={[10, 1, 0]} scale={8} />
+                        </group>
+                    </Environment>
 
                     <Model />
                     <GeometricField />
