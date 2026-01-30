@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ArrowLeft, Check, Send } from "lucide-react";
-import Link from "next/link"; // For the back button/logo link if needed
+import { ArrowRight, ArrowLeft, Check, Send, Loader2 } from "lucide-react";
+import Link from "next/link";
 
 export default function StartProject() {
     const [step, setStep] = useState(1);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -16,6 +18,33 @@ export default function StartProject() {
         description: "",
         deadline: ""
     });
+
+    const handleSubmit = async () => {
+        setIsSubmitting(true);
+        setSubmitStatus('idle');
+
+        try {
+            const response = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...formData,
+                    formType: 'project'
+                }),
+            });
+
+            if (response.ok) {
+                setSubmitStatus('success');
+                setStep(5); // Go to success step
+            } else {
+                setSubmitStatus('error');
+            }
+        } catch {
+            setSubmitStatus('error');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     const updateFormData = (key: string, value: any) => {
         setFormData(prev => ({ ...prev, [key]: value }));
@@ -132,22 +161,53 @@ export default function StartProject() {
                                         We'll review your project details and get back to you within 24 hours to schedule a discovery call.
                                     </p>
 
-                                    {/* Summary Review (Optional, keeping it simple for now) */}
+                                    {submitStatus === 'error' && (
+                                        <p className="text-red-400 mb-6">Something went wrong. Please try again.</p>
+                                    )}
 
                                     <div className="flex flex-col gap-4 max-w-xs mx-auto">
                                         <button
-                                            className="w-full bg-white text-black font-bold py-4 rounded-full flex items-center justify-center gap-2 hover:bg-zinc-200 transition-all hover:scale-105"
-                                            onClick={() => alert("Form submitted! (This is a demo)")}
+                                            className="w-full bg-white text-black font-bold py-4 rounded-full flex items-center justify-center gap-2 hover:bg-zinc-200 transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            onClick={handleSubmit}
+                                            disabled={isSubmitting}
                                         >
-                                            Submit Proposal
+                                            {isSubmitting ? (
+                                                <>
+                                                    <Loader2 size={18} className="animate-spin" />
+                                                    Sending...
+                                                </>
+                                            ) : (
+                                                'Submit Proposal'
+                                            )}
                                         </button>
                                         <button
                                             onClick={prevStep}
-                                            className="text-zinc-500 hover:text-white transition-colors text-sm"
+                                            disabled={isSubmitting}
+                                            className="text-zinc-500 hover:text-white transition-colors text-sm disabled:opacity-50"
                                         >
                                             Go Back
                                         </button>
                                     </div>
+                                </div>
+                            </StepWrapper>
+                        )}
+
+                        {step === 5 && (
+                            <StepWrapper key="step5">
+                                <div className="text-center">
+                                    <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-8 text-green-500">
+                                        <Check size={40} />
+                                    </div>
+                                    <h1 className="text-4xl md:text-5xl font-bold mb-6">Message Sent!</h1>
+                                    <p className="text-xl text-zinc-400 mb-10 max-w-md mx-auto">
+                                        Thanks for reaching out, {formData.name.split(' ')[0]}! We'll be in touch within 24 hours.
+                                    </p>
+                                    <Link
+                                        href="/"
+                                        className="inline-block bg-white text-black font-bold py-4 px-8 rounded-full hover:bg-zinc-200 transition-all hover:scale-105"
+                                    >
+                                        Back to Home
+                                    </Link>
                                 </div>
                             </StepWrapper>
                         )}

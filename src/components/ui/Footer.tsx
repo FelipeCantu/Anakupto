@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Github, Twitter, Linkedin, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { useUI } from "@/context/UIContext";
 
 export function Footer() {
@@ -64,9 +64,6 @@ export function Footer() {
                 <div className="space-y-6">
                     <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Connect</h3>
                     <div className="flex gap-4">
-                        <SocialLink href="https://twitter.com" icon={<Twitter size={20} />} />
-                        <SocialLink href="https://github.com" icon={<Github size={20} />} />
-                        <SocialLink href="https://linkedin.com" icon={<Linkedin size={20} />} />
                         <SocialLink href="mailto:hello@anakupto.com" icon={<Mail size={20} />} />
                     </div>
                 </div>

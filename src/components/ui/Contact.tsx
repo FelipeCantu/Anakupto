@@ -24,7 +24,7 @@ export function Contact() {
                         <Mail size={20} />
                         Email Us
                     </a>
-                    <a href="#" className="px-8 py-4 bg-white/10 text-white rounded-full font-bold text-lg flex items-center justify-center gap-2 hover:bg-white/20 transition-colors backdrop-blur-sm">
+                    <a href="https://cal.com/j.r.-cantu-aoun4r" target="_blank" rel="noopener noreferrer" className="px-8 py-4 bg-white/10 text-white rounded-full font-bold text-lg flex items-center justify-center gap-2 hover:bg-white/20 transition-colors backdrop-blur-sm">
                         <MessageSquare size={20} />
                         Book a Call <ArrowRight size={20} />
                     </a>

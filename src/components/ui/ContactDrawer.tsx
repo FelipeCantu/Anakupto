@@ -1,11 +1,40 @@
 "use client";
 
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Send, Mail, Phone, MapPin } from "lucide-react";
+import { X, Send, Mail, MapPin, Loader2, Check } from "lucide-react";
 import { useUI } from "@/context/UIContext";
 
 export function ContactDrawer() {
     const { isContactOpen, closeContact } = useUI();
+    const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setStatus('idle');
+
+        try {
+            const response = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...formData, formType: 'contact' }),
+            });
+
+            if (response.ok) {
+                setStatus('success');
+                setFormData({ name: '', email: '', message: '' });
+            } else {
+                setStatus('error');
+            }
+        } catch {
+            setStatus('error');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <AnimatePresence>
@@ -44,40 +73,82 @@ export function ContactDrawer() {
                                     Have a project in mind? We'd love to hear from you. Fill out the form below or send us an email.
                                 </p>
 
-                                <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-                                    <div className="space-y-2">
-                                        <label htmlFor="name" className="text-sm font-medium text-zinc-300">Name</label>
-                                        <input
-                                            type="text"
-                                            id="name"
-                                            className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
-                                            placeholder="Your Name"
-                                        />
+                                {status === 'success' ? (
+                                    <div className="text-center py-12">
+                                        <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6 text-green-500">
+                                            <Check size={32} />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-white mb-2">Message Sent!</h3>
+                                        <p className="text-zinc-400 mb-6">We'll get back to you soon.</p>
+                                        <button
+                                            onClick={() => setStatus('idle')}
+                                            className="text-blue-400 hover:text-blue-300 transition-colors"
+                                        >
+                                            Send another message
+                                        </button>
                                     </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="email" className="text-sm font-medium text-zinc-300">Email</label>
-                                        <input
-                                            type="email"
-                                            id="email"
-                                            className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
-                                            placeholder="hello@example.com"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="message" className="text-sm font-medium text-zinc-300">Message</label>
-                                        <textarea
-                                            id="message"
-                                            rows={6}
-                                            className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors resize-none"
-                                            placeholder="Tell us about your project..."
-                                        />
-                                    </div>
+                                ) : (
+                                    <form className="space-y-6" onSubmit={handleSubmit}>
+                                        <div className="space-y-2">
+                                            <label htmlFor="name" className="text-sm font-medium text-zinc-300">Name</label>
+                                            <input
+                                                type="text"
+                                                id="name"
+                                                required
+                                                value={formData.name}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                                                className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                                                placeholder="Your Name"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label htmlFor="email" className="text-sm font-medium text-zinc-300">Email</label>
+                                            <input
+                                                type="email"
+                                                id="email"
+                                                required
+                                                value={formData.email}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                                                className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                                                placeholder="hello@example.com"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label htmlFor="message" className="text-sm font-medium text-zinc-300">Message</label>
+                                            <textarea
+                                                id="message"
+                                                rows={6}
+                                                required
+                                                value={formData.message}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                                                className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors resize-none"
+                                                placeholder="Tell us about your project..."
+                                            />
+                                        </div>
 
-                                    <button className="w-full bg-white text-black font-bold py-4 rounded-lg flex items-center justify-center gap-2 hover:bg-zinc-200 transition-colors group">
-                                        Send Message
-                                        <Send size={18} className="group-hover:translate-x-1 transition-transform" />
-                                    </button>
-                                </form>
+                                        {status === 'error' && (
+                                            <p className="text-red-400 text-sm">Something went wrong. Please try again.</p>
+                                        )}
+
+                                        <button
+                                            type="submit"
+                                            disabled={isSubmitting}
+                                            className="w-full bg-white text-black font-bold py-4 rounded-lg flex items-center justify-center gap-2 hover:bg-zinc-200 transition-colors group disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {isSubmitting ? (
+                                                <>
+                                                    <Loader2 size={18} className="animate-spin" />
+                                                    Sending...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    Send Message
+                                                    <Send size={18} className="group-hover:translate-x-1 transition-transform" />
+                                                </>
+                                            )}
+                                        </button>
+                                    </form>
+                                )}
 
                                 <div className="pt-12 border-t border-white/10 space-y-4">
                                     <div className="flex items-center gap-4 text-zinc-400">
@@ -85,12 +156,8 @@ export function ContactDrawer() {
                                         <span>hello@anakupto.com</span>
                                     </div>
                                     <div className="flex items-center gap-4 text-zinc-400">
-                                        <Phone size={18} />
-                                        <span>+1 (555) 000-0000</span>
-                                    </div>
-                                    <div className="flex items-center gap-4 text-zinc-400">
                                         <MapPin size={18} />
-                                        <span>San Francisco, CA</span>
+                                        <span>Dallas, Texas</span>
                                     </div>
                                 </div>
                             </div>

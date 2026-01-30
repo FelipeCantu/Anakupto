@@ -1,15 +1,15 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useRef, useState, useEffect, useCallback } from "react";
+import { motion, useMotionValue, useSpring, useTransform, useAnimation } from "framer-motion";
 import Image from "next/image";
-import { ArrowRight, ExternalLink } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 const projects = [
     {
         id: 1,
         title: "Neo-Tokyo Net",
-        category: "Immersive Cityscape",
+        category: "Concept • Immersive Cityscape",
         image: "/projects/cyberpunk.png",
         description: "A fully explorable 3D city interface for a decentralized network.",
         color: "#00f0ff"
@@ -17,15 +17,15 @@ const projects = [
     {
         id: 2,
         title: "Luminous Forms",
-        category: "Virtual Gallery",
+        category: "Concept • Virtual Gallery",
         image: "/projects/gallery.png",
-        description: "Digital art exhibition space featuring proceedurally generated sculptures.",
+        description: "Digital art exhibition space featuring procedurally generated sculptures.",
         color: "#ff0055"
     },
     {
         id: 3,
         title: "Aura X Configurator",
-        category: "E-Commerce",
+        category: "Concept • E-Commerce",
         image: "/projects/ecommerce.png",
         description: "Real-time 3D product customization with physics-based materials.",
         color: "#ffffff"
@@ -33,15 +33,15 @@ const projects = [
     {
         id: 4,
         title: "Gaia Visualizer",
-        category: "Data Visualization",
+        category: "Concept • Data Visualization",
         image: "/projects/globe.png",
         description: "Global climate data visualized in an interactive WebGL globe.",
         color: "#00ff88"
     },
     {
         id: 5,
-        title: "Archiviz Studio",
-        category: "Real Estate",
+        title: "Archviz Studio",
+        category: "Concept • Real Estate",
         image: "/projects/archviz.png",
         description: "Photorealistic architectural walkthroughs directly in the browser.",
         color: "#fbbf24"
@@ -49,7 +49,7 @@ const projects = [
     {
         id: 6,
         title: "Luxe Motorsports",
-        category: "Automotive",
+        category: "Concept • Automotive",
         image: "/projects/automotive.png",
         description: "High-fidelity car configurator with cinematic studio lighting.",
         color: "#94a3b8"
@@ -58,32 +58,50 @@ const projects = [
 
 export function PortfolioCarousel() {
     const carouselRef = useRef<HTMLDivElement>(null);
-    const [width, setWidth] = useState(0);
+    const innerRef = useRef<HTMLDivElement>(null);
+    const [constraints, setConstraints] = useState({ left: 0, right: 0 });
 
-    useEffect(() => {
-        if (carouselRef.current) {
-            setWidth(carouselRef.current.scrollWidth - carouselRef.current.offsetWidth);
+    const calculateConstraints = useCallback(() => {
+        if (carouselRef.current && innerRef.current) {
+            const containerWidth = carouselRef.current.offsetWidth;
+            const contentWidth = innerRef.current.scrollWidth;
+            setConstraints({
+                left: -(contentWidth - containerWidth + 32),
+                right: 0
+            });
         }
     }, []);
 
+    useEffect(() => {
+        calculateConstraints();
+        window.addEventListener("resize", calculateConstraints);
+        return () => window.removeEventListener("resize", calculateConstraints);
+    }, [calculateConstraints]);
+
     return (
-        <div id="work" className="w-full py-32 overflow-hidden relative z-20">
-            <div className="max-w-7xl mx-auto px-8 mb-16 flex justify-between items-end">
+        <div id="work" className="w-full py-24 md:py-32 overflow-hidden relative z-20">
+            <div className="max-w-7xl mx-auto px-6 md:px-8 mb-12 md:mb-16 flex justify-between items-end">
                 <div>
-                    <h2 className="text-4xl md:text-6xl font-bold mb-4">Selected Work</h2>
-                    <p className="text-xl text-zinc-400">Exploring the boundaries of web spaces.</p>
+                    <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4">What We Build</h2>
+                    <p className="text-lg md:text-xl text-zinc-400">Concept projects showcasing our capabilities.</p>
                 </div>
-                <div className="hidden md:flex gap-2">
-                    <span className="text-sm text-zinc-500 uppercase tracking-widest">Drag to explore</span>
-                    <ArrowRight className="text-zinc-500" />
+                <div className="hidden md:flex items-center gap-2 text-zinc-500">
+                    <span className="text-sm uppercase tracking-widest">Drag to explore</span>
+                    <ArrowRight size={16} />
                 </div>
             </div>
 
-            <motion.div ref={carouselRef} className="cursor-grab active:cursor-grabbing pl-8 md:pl-[max(2rem,calc((100vw-80rem)/2))]">
+            <motion.div
+                ref={carouselRef}
+                className="cursor-grab active:cursor-grabbing"
+            >
                 <motion.div
+                    ref={innerRef}
                     drag="x"
-                    dragConstraints={{ right: 0, left: -width }}
-                    className="flex gap-8 md:gap-12 w-fit pr-12"
+                    dragConstraints={constraints}
+                    dragElastic={0.1}
+                    dragTransition={{ bounceStiffness: 300, bounceDamping: 30 }}
+                    className="flex gap-6 md:gap-8 px-6 md:px-8 lg:px-[max(2rem,calc((100vw-80rem)/2+2rem))]"
                 >
                     {projects.map((project) => (
                         <PortfolioCard key={project.id} project={project} />
@@ -94,25 +112,31 @@ export function PortfolioCarousel() {
     );
 }
 
-function PortfolioCard({ project }: { project: any }) {
+interface Project {
+    id: number;
+    title: string;
+    category: string;
+    image: string;
+    description: string;
+    color: string;
+}
+
+function PortfolioCard({ project }: { project: Project }) {
+    const cardRef = useRef<HTMLDivElement>(null);
     const x = useMotionValue(0);
     const y = useMotionValue(0);
 
-    // Smoother, heavier feel for premium effect
-    const mouseXSpring = useSpring(x, { stiffness: 150, damping: 15 });
-    const mouseYSpring = useSpring(y, { stiffness: 150, damping: 15 });
+    const mouseXSpring = useSpring(x, { stiffness: 300, damping: 30 });
+    const mouseYSpring = useSpring(y, { stiffness: 300, damping: 30 });
 
-    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["12deg", "-12deg"]);
-    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-12deg", "12deg"]);
+    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["6deg", "-6deg"]);
+    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-6deg", "6deg"]);
 
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const width = rect.width;
-        const height = rect.height;
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-        const xPct = mouseX / width - 0.5;
-        const yPct = mouseY / height - 0.5;
+        if (!cardRef.current) return;
+        const rect = cardRef.current.getBoundingClientRect();
+        const xPct = (e.clientX - rect.left) / rect.width - 0.5;
+        const yPct = (e.clientY - rect.top) / rect.height - 0.5;
         x.set(xPct);
         y.set(yPct);
     };
@@ -124,6 +148,7 @@ function PortfolioCard({ project }: { project: any }) {
 
     return (
         <motion.div
+            ref={cardRef}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             style={{
@@ -131,46 +156,40 @@ function PortfolioCard({ project }: { project: any }) {
                 rotateY,
                 transformStyle: "preserve-3d",
             }}
-            className="relative w-[85vw] md:w-[600px] h-[50vh] md:h-[500px] rounded-3xl bg-zinc-900/90 border border-white/20 backdrop-blur-md group select-none"
+            className="relative flex-shrink-0 w-[80vw] sm:w-[70vw] md:w-[500px] lg:w-[550px] aspect-[4/5] rounded-2xl md:rounded-3xl bg-zinc-900 border border-white/10 group select-none overflow-hidden"
         >
-            {/* Dynamic Glow Behind */}
+            {/* Glow effect */}
             <div
-                className="absolute inset-0 -z-10 rounded-3xl opacity-0 group-hover:opacity-60 transition-opacity duration-500 blur-3xl"
-                style={{ background: `radial-gradient(circle at center, ${project.color}, transparent 70%)` }}
+                className="absolute -inset-4 -z-10 rounded-3xl opacity-0 group-hover:opacity-40 transition-opacity duration-700 blur-2xl"
+                style={{ background: project.color }}
             />
 
-            <div
-                style={{
-                    transform: "translateZ(75px)",
-                    transformStyle: "preserve-3d",
-                }}
-                className="absolute inset-4 rounded-2xl overflow-hidden shadow-2xl"
-            >
+            {/* Image */}
+            <div className="absolute inset-3 md:inset-4 rounded-xl md:rounded-2xl overflow-hidden">
                 <Image
                     src={project.image}
                     alt={project.title}
                     fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                    sizes="(max-width: 768px) 80vw, 550px"
                 />
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
             </div>
 
-            <div
-                style={{ transform: "translateZ(50px)" }}
-                className="absolute bottom-8 left-8 right-8"
-            >
-                <div className="bg-black/60 backdrop-blur-md p-6 rounded-2xl border border-white/5 shadow-xl">
-                    <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: project.color }}>{project.category}</p>
-                    <h3 className="text-2xl md:text-3xl font-bold text-white mb-2 tracking-tight">{project.title}</h3>
-                    <p className="text-zinc-400 text-sm line-clamp-2">{project.description}</p>
-                </div>
-            </div>
-
-            <div
-                style={{ transform: "translateZ(60px)" }}
-                className="absolute top-8 right-8 w-12 h-12 rounded-full bg-white text-black flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0 shadow-lg hover:scale-110"
-            >
-                <ExternalLink size={20} />
+            {/* Content */}
+            <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8">
+                <p
+                    className="text-[10px] md:text-xs font-semibold uppercase tracking-wider mb-2 md:mb-3"
+                    style={{ color: project.color }}
+                >
+                    {project.category}
+                </p>
+                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-1 md:mb-2">
+                    {project.title}
+                </h3>
+                <p className="text-zinc-400 text-sm md:text-base line-clamp-2 leading-relaxed">
+                    {project.description}
+                </p>
             </div>
         </motion.div>
     );
