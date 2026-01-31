@@ -138,9 +138,10 @@ export function InteractiveStars({ count = 3000 }) {
              // Highlight based on distance (using the morphed distance)
              float highlight = 1.0 - smoothstep(0.0, 0.5, vDistance);
              
-             // Colors: Bright white/blue -> Bright cyan/purple
-             vec3 baseColor = vec3(0.8, 0.9, 1.0);
-             vec3 activeColor = mix(vec3(0.0, 1.0, 1.0), vec3(0.8, 0.2, 1.0), highlight);
+             // Colors: Slate White -> Sky Blue / Indigo
+             vec3 baseColor = vec3(0.9, 0.95, 1.0);
+             // Mix between Sky Blue (#38bdf8) and Indigo (#6366f1)
+             vec3 activeColor = mix(vec3(0.22, 0.74, 0.97), vec3(0.39, 0.40, 0.94), highlight);
              
              vec3 finalColor = mix(baseColor, activeColor, highlight);
              

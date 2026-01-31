@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #02040f;
-  --foreground: #e5dada;
-  --primary: #840032;
-  --secondary: #002642;
-  --accent: #e59500;
+  --background: #020617;
+  --foreground: #f8fafc;
+  --primary: #6366f1;
+  --secondary: #1e293b;
+  --accent: #38bdf8;
 }
 
 @theme {
@@ -64,4 +64,41 @@ html.lenis body {
 
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
+}
+
+/* Animated gradient backgrounds */
+@keyframes gradient-shift {
+
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1) rotate(0deg);
+  }
+
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1) rotate(3deg);
+  }
+}
+
+@keyframes gradient-shift-reverse {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1.1) rotate(0deg);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(1) rotate(-3deg);
+  }
+}
+
+.animate-gradient {
+  animation: gradient-shift 8s ease-in-out infinite;
+}
+
+.animate-gradient-reverse {
+  animation: gradient-shift-reverse 10s ease-in-out infinite;
 }

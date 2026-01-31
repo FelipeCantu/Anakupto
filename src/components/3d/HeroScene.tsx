@@ -26,37 +26,37 @@ type SceneState = {
 
 // Morphable Shapes (Base is the first one)
 const SCENE_STATES: SceneState[] = [
-    // 0: Hero - Balanced & Airy (Secondary: #002642)
+    // 0: Hero - Balanced & Airy (Secondary: #1e293b)
     {
         position: [0, 0, 0],
         rotation: [0, 0, 0],
         scale: 1.6,
-        color: "#002642",
+        color: "#1e293b",
         knot: { p: 2, q: 3, radius: 1, tube: 0.22 }
     },
-    // 1: Technical - Sharp & Crystalline (Accent: #e59500)
+    // 1: Technical - Sharp & Crystalline (Accent: #38bdf8)
     {
         position: [3.5, 0, 0],
         rotation: [0, -Math.PI / 4, 0],
         scale: 1.3,
-        color: "#e59500",
+        color: "#38bdf8",
         // Reduced p from 10 to 6 for a cleaner morph
         knot: { p: 6, q: 3, radius: 0.8, tube: 0.35 }
     },
-    // 2: Flow - Smooth & Interwoven (Primary: #840032)
+    // 2: Flow - Smooth & Interwoven (Primary: #6366f1)
     {
         position: [-3.5, 0, 0],
         rotation: [Math.PI / 8, Math.PI / 4, 0],
         scale: 1.4,
-        color: "#840032",
+        color: "#6366f1",
         knot: { p: 3, q: 2, radius: 0.9, tube: 0.25 }
     },
-    // 3: Future - Minimalist & Orbital (Foreground: #e5dada)
+    // 3: Future - Minimalist & Orbital (Foreground: #f8fafc)
     {
         position: [0, -0.5, 0],
         rotation: [Math.PI / 2, 0, Math.PI],
         scale: 1.3,
-        color: "#e5dada",
+        color: "#f8fafc",
         knot: { p: 1, q: 2, radius: 1.1, tube: 0.12 }
     },
 ];

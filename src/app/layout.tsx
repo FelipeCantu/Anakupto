@@ -6,6 +6,7 @@ import { Header } from "@/components/ui/Header";
 import { Footer } from "@/components/ui/Footer";
 import { UIProvider } from "@/context/UIContext";
 import { ContactDrawer } from "@/components/ui/ContactDrawer";
+import { AuthProvider } from "@/context/AuthContext";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -26,14 +27,16 @@ export default function RootLayout({
   return (
     <html lang="en" className="lenis">
       <body className={`${outfit.variable} antialiased bg-background text-foreground`}>
-        <UIProvider>
-          <Header />
-          <ContactDrawer />
-          <SmoothScroll>
-            {children}
-            <Footer />
-          </SmoothScroll>
-        </UIProvider>
+        <AuthProvider>
+          <UIProvider>
+            <Header />
+            <ContactDrawer />
+            <SmoothScroll>
+              {children}
+              <Footer />
+            </SmoothScroll>
+          </UIProvider>
+        </AuthProvider>
       </body>
     </html>
   );

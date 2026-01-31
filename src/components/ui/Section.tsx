@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
 import { MoveRight } from "lucide-react";
 import Link from "next/link";
+import { TextReveal } from "@/components/ui/TextReveal";
 
 interface SectionProps {
     children: React.ReactNode;
@@ -45,7 +46,7 @@ export function HeroContent() {
 
 
             {/* Main Center Content */}
-            <div className="text-center max-w-5xl mx-auto space-y-8 mix-blend-difference relative z-10">
+            <div className="text-center max-w-5xl mx-auto space-y-8 relative z-10">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -55,21 +56,29 @@ export function HeroContent() {
                     {/* Decorative blurred glow behind title */}
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-white/5 blur-3xl rounded-full -z-10" />
 
-                    <h1 className="text-5xl md:text-9xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500">
-                        ANAKUPTO
-                        <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-500 via-zinc-200 to-zinc-500 animate-gradient bg-300%">3D WEB</span>
-                    </h1>
+                    <div className="relative">
+                        <h1 className="text-5xl md:text-9xl font-bold tracking-tighter text-white">
+                            <TextReveal as="span" mode="char" delay={0.2} stagger={0.05} className="inline-block text-white">
+                                TRANSCEND
+                            </TextReveal>
+                            <br />
+                            <TextReveal as="span" mode="char" delay={0.8} stagger={0.05} className="inline-block text-zinc-500">
+                                THE SCREEN
+                            </TextReveal>
+                        </h1>
+                    </div>
                 </motion.div>
 
-                <motion.p
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5, duration: 1 }}
-                    className="text-xl md:text-2xl text-zinc-400 font-light tracking-wide max-w-2xl mx-auto"
-                >
-                    We craft immersive digital worlds where design meets <span className="text-white font-medium">dimension</span>.
-                </motion.p>
+                <div className="max-w-2xl mx-auto">
+                    <TextReveal
+                        mode="word"
+                        delay={1.5}
+                        stagger={0.04}
+                        className="text-xl md:text-2xl text-zinc-400 font-light tracking-wide justify-center"
+                    >
+                        Anakupto engineers high-fidelity 3D experiences that captivate and convert. We turn static layouts into living worlds.
+                    </TextReveal>
+                </div>
 
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}

@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { HeroContent, Section } from "@/components/ui/Section";
-import Image from "next/image";
+import { Section } from "@/components/ui/Section";
+import { AboutVisual } from "@/components/3d/AboutVisual";
+import { TextReveal, FadeIn } from "@/components/ui/TextReveal";
 
 export default function AboutPage() {
     return (
@@ -13,48 +14,44 @@ export default function AboutPage() {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
-                        className="text-6xl md:text-8xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white to-zinc-500"
+                        className="text-6xl md:text-8xl font-bold mb-8 text-white"
                     >
-                        Who We Are
+                        <TextReveal as="span" mode="char" stagger={0.05}>
+                            Who We Are
+                        </TextReveal>
                     </motion.h1>
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2, duration: 0.8 }}
-                        className="text-xl md:text-2xl text-zinc-400 leading-relaxed"
-                    >
-                        Anakupto is a digital studio at the intersection of design, technology, and imagination. We don't just build websites; we craft immersive worlds.
-                    </motion.p>
+                    <div className="text-xl md:text-2xl text-zinc-400 leading-relaxed justify-center flex">
+                        <TextReveal mode="word" delay={0.5} stagger={0.02} className="justify-center max-w-3xl">
+                            Anakupto is a digital studio at the intersection of design, technology, and imagination. We don't just build websites; we craft immersive worlds.
+                        </TextReveal>
+                    </div>
                 </div>
             </Section>
 
             <div className="max-w-7xl mx-auto px-8 pb-32 grid md:grid-cols-2 gap-16 items-center">
-                <motion.div
-                    initial={{ opacity: 0, x: -50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    className="space-y-8 text-lg text-zinc-300"
-                >
-                    <h2 className="text-3xl font-bold text-white">Our Philosophy</h2>
-                    <p>
-                        The web has evolved beyond static pages. We believe in the power of **WebGL** and **Real-time 3D** to tell stories in ways that were previously impossible.
-                    </p>
-                    <p>
-                        Every pixel, every interaction, and every frame is calculated to deliver maximum impact without compromising performance.
-                    </p>
-                </motion.div>
+                <div className="space-y-8 text-lg text-zinc-300">
+                    <h2 className="text-3xl font-bold text-white">
+                        <TextReveal mode="word">Our Philosophy</TextReveal>
+                    </h2>
+                    <FadeIn delay={0.3}>
+                        <p className="mb-6">
+                            The web has evolved beyond static pages. We believe in the power of <strong className="text-white">WebGL</strong> and <strong className="text-white">Real-time 3D</strong> to tell stories in ways that were previously impossible.
+                        </p>
+                    </FadeIn>
+                    <FadeIn delay={0.5}>
+                        <p>
+                            Every pixel, every interaction, and every frame is calculated to deliver maximum impact without compromising performance.
+                        </p>
+                    </FadeIn>
+                </div>
 
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    className="relative h-[500px] w-full bg-zinc-900 rounded-3xl overflow-hidden border border-white/10"
+                    className="relative h-[500px] w-full bg-zinc-900/50 rounded-3xl overflow-hidden border border-white/10"
                 >
-                    {/* Placeholder for team image or studio shot */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20"></div>
-                    <div className="flex items-center justify-center h-full text-zinc-500 font-mono">
-                        [Studio Image / Showreel]
-                    </div>
+                    <AboutVisual />
                 </motion.div>
             </div>
         </main>

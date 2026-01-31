@@ -23,6 +23,7 @@ export function Header() {
     const getHref = (item: string) => {
         if (item === 'Contact') return '#';
         if (item === 'About') return '/about';
+        if (item === 'Work') return '/work';
         return `/#${item.toLowerCase()}`;
     };
 
