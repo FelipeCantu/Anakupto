@@ -34,19 +34,20 @@ const PROJECTS_COLLECTION = "projects";
 
 // Public: Get all published projects
 export async function getProjects(limitCount?: number): Promise<Project[]> {
+  if (!db) return [];
   const projectsRef = collection(db, PROJECTS_COLLECTION);
   const q = limitCount
     ? query(
-        projectsRef,
-        where("published", "==", true),
-        orderBy("order", "asc"),
-        limit(limitCount)
-      )
+      projectsRef,
+      where("published", "==", true),
+      orderBy("order", "asc"),
+      limit(limitCount)
+    )
     : query(
-        projectsRef,
-        where("published", "==", true),
-        orderBy("order", "asc")
-      );
+      projectsRef,
+      where("published", "==", true),
+      orderBy("order", "asc")
+    );
 
   const snapshot = await getDocs(q);
   return snapshot.docs.map((doc) => ({
@@ -57,6 +58,7 @@ export async function getProjects(limitCount?: number): Promise<Project[]> {
 
 // Public: Get single project by slug
 export async function getProjectBySlug(slug: string): Promise<Project | null> {
+  if (!db) return null;
   const projectsRef = collection(db, PROJECTS_COLLECTION);
   const q = query(
     projectsRef,
@@ -74,6 +76,7 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
 
 // Admin: Get all projects (including unpublished)
 export async function getAllProjects(): Promise<Project[]> {
+  if (!db) return [];
   const projectsRef = collection(db, PROJECTS_COLLECTION);
   const q = query(projectsRef, orderBy("order", "asc"));
 
@@ -86,6 +89,7 @@ export async function getAllProjects(): Promise<Project[]> {
 
 // Admin: Get project by ID
 export async function getProjectById(id: string): Promise<Project | null> {
+  if (!db) return null;
   const docRef = doc(db, PROJECTS_COLLECTION, id);
   const snapshot = await getDoc(docRef);
 
@@ -97,6 +101,7 @@ export async function getProjectById(id: string): Promise<Project | null> {
 export async function createProject(
   data: Omit<Project, "id">
 ): Promise<string> {
+  if (!db) throw new Error("Firestore not initialized");
   const projectsRef = collection(db, PROJECTS_COLLECTION);
   const docRef = await addDoc(projectsRef, data);
   return docRef.id;
@@ -107,12 +112,14 @@ export async function updateProject(
   id: string,
   data: Partial<Omit<Project, "id">>
 ): Promise<void> {
+  if (!db) throw new Error("Firestore not initialized");
   const docRef = doc(db, PROJECTS_COLLECTION, id);
   await updateDoc(docRef, data);
 }
 
 // Admin: Delete project
 export async function deleteProject(id: string): Promise<void> {
+  if (!db) throw new Error("Firestore not initialized");
   const docRef = doc(db, PROJECTS_COLLECTION, id);
   await deleteDoc(docRef);
 }
